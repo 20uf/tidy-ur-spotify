@@ -1,5 +1,7 @@
 # Spotify Ranger
 
+> **Prototype (v0.1.0-alpha)** — This project is in early development and open to everyone. Feedback, ideas and contributions are welcome!
+
 Automatically classify your Spotify "Liked Songs" into themed playlists using AI.
 
 | Playlist | Style |
