@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.env
+.cache/
+*.spec
+venv/
+.venv/
+progress.json
+export.csv
+.spotify_cache
+config.json
