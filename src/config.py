@@ -1,19 +1,29 @@
 """Configuration: playlist themes, constants, and app settings."""
 
-import os
-from dotenv import load_dotenv
+from src.storage import user_config
 
-load_dotenv()
+_cfg = user_config.load()
+
+
+def reload():
+    """Reload config from disk (call after setup dialog saves)."""
+    global _cfg, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_REDIRECT_URI, LLM_API_KEY
+    _cfg = user_config.load()
+    SPOTIFY_CLIENT_ID = _cfg.get("spotify_client_id", "")
+    SPOTIFY_CLIENT_SECRET = _cfg.get("spotify_client_secret", "")
+    SPOTIFY_REDIRECT_URI = _cfg.get("spotify_redirect_uri", "http://localhost:8888/callback")
+    LLM_API_KEY = _cfg.get("llm_api_key", "")
+
 
 # Spotify API
-SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID", "")
-SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET", "")
-SPOTIFY_REDIRECT_URI = os.getenv("SPOTIFY_REDIRECT_URI", "http://localhost:8888/callback")
+SPOTIFY_CLIENT_ID = _cfg.get("spotify_client_id", "")
+SPOTIFY_CLIENT_SECRET = _cfg.get("spotify_client_secret", "")
+SPOTIFY_REDIRECT_URI = _cfg.get("spotify_redirect_uri", "http://localhost:8888/callback")
 SPOTIFY_SCOPE = "user-library-read playlist-modify-public playlist-modify-private playlist-read-private"
 SPOTIFY_CACHE_PATH = ".spotify_cache"
 
 # LLM API
-LLM_API_KEY = os.getenv("LLM_API_KEY", "")
+LLM_API_KEY = _cfg.get("llm_api_key", "")
 LLM_MODEL = "claude-3-haiku-20240307"
 LLM_BATCH_SIZE = 10  # Pre-classify tracks in batches of 10
 

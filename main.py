@@ -4,7 +4,21 @@ import sys
 
 
 def main():
-    # Lazy imports to allow fast --help / error messages
+    from src.storage import user_config
+
+    # First-launch: show setup dialog if config is missing
+    if not user_config.is_configured():
+        from src.ui.setup_dialog import SetupDialog
+
+        dialog = SetupDialog()
+        if not dialog.show():
+            print("Setup cancelled.")
+            sys.exit(0)
+
+    # Reload config after potential setup
+    from src.config import reload
+    reload()
+
     from src.auth.spotify_oauth import get_spotify_client
     from src.services.llm_classifier import LLMClassifier
     from src.services.playlist_manager import PlaylistManager
@@ -19,7 +33,7 @@ def main():
         print(f"Logged in as: {user['display_name']}")
     except Exception as e:
         print(f"Spotify auth failed: {e}")
-        print("Check your .env file (SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET)")
+        print("Check your config.json (spotify_client_id, spotify_client_secret)")
         sys.exit(1)
 
     print("Fetching liked songs...")

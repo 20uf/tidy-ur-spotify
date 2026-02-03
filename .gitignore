@@ -12,3 +12,4 @@ venv/
 progress.json
 export.csv
 .spotify_cache
+config.json
