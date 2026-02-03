@@ -55,15 +55,25 @@ class TestParseResponse:
         assert result[0].reasoning == ""
 
 
+def _make_classifier():
+    """Create a classifier instance without calling the real __init__."""
+    obj = LLMClassifier.__new__(LLMClassifier)
+    obj.provider = "openai"
+    obj.api_key = ""
+    obj.model = "gpt-4o-mini"
+    obj._caller = None
+    obj._cache = {}
+    return obj
+
+
 class TestClassifyBatch:
     def test_empty_batch(self):
-        classifier = LLMClassifier.__new__(LLMClassifier)
-        classifier._cache = {}
+        classifier = _make_classifier()
         result = classifier.classify_batch([])
         assert result == []
 
     def test_all_cached(self):
-        classifier = LLMClassifier.__new__(LLMClassifier)
+        classifier = _make_classifier()
         suggestion = TrackSuggestion("t1", "ambiance", 0.9, "Chill")
         classifier._cache = {"t1": [suggestion]}
         result = classifier.classify_batch([{"id": "t1", "name": "X", "artist": "Y", "album": "Z", "popularity": 50}])

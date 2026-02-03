@@ -22,7 +22,9 @@ _DEFAULTS = {
     "spotify_client_id": "",
     "spotify_client_secret": "",
     "spotify_redirect_uri": "http://localhost:8888/callback",
+    "llm_provider": "openai",
     "llm_api_key": "",
+    "llm_model": "",
 }
 
 
@@ -44,4 +46,9 @@ def save(cfg: dict) -> None:
 def is_configured() -> bool:
     """Return True if all required keys are filled in."""
     cfg = load()
-    return bool(cfg.get("spotify_client_id") and cfg.get("spotify_client_secret") and cfg.get("llm_api_key"))
+    return bool(
+        cfg.get("spotify_client_id")
+        and cfg.get("spotify_client_secret")
+        and cfg.get("llm_api_key")
+        and cfg.get("llm_provider")
+    )

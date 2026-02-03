@@ -22,7 +22,7 @@ python -m pytest tests/ -v
 python main.py
 ```
 
-Au premier lancement, une fenetre de configuration s'ouvre pour les cles API.
+Au premier lancement, un assistant de configuration guide l'utilisateur pour configurer Spotify et le fournisseur IA.
 
 ## Builder un binaire
 
@@ -71,15 +71,22 @@ src/
 ├── config.py                    # Themes, constantes
 ├── services/
 │   ├── track_fetcher.py         # Recuperation liked songs
-│   ├── llm_classifier.py        # Classification IA par batch
+│   ├── llm_classifier.py        # Classification IA multi-provider
 │   └── playlist_manager.py      # Gestion playlists Spotify
 ├── storage/
 │   ├── progress_store.py        # Sauvegarde progression JSON
 │   └── user_config.py           # Config persistante (config.json)
 └── ui/
     ├── main_window.py           # GUI principale Tkinter
-    └── setup_dialog.py          # Dialog config premier lancement
+    └── setup_dialog.py          # Assistant de configuration 4 etapes
 ```
+
+### Ajouter un fournisseur IA
+
+1. Ajouter l'entree dans `PROVIDERS` dans `src/services/llm_classifier.py`
+2. Creer la fonction `_call_<provider>` avec la meme signature
+3. L'enregistrer dans `_PROVIDER_CALLERS`
+4. Le wizard le detecte automatiquement
 
 ## Convention de commits
 

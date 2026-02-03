@@ -23,31 +23,32 @@ Rendez-vous sur la page [Releases](../../releases) et telecharge le fichier corr
 
 ### Pre-requis
 
-Avant de lancer l'application, tu as besoin de deux choses :
+- Un compte Spotify (gratuit ou premium)
+- Une cle API d'un fournisseur IA (OpenAI recommande, ou Anthropic)
 
-**1. Une app Spotify Developer**
-
-- Va sur [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard)
-- Cree une nouvelle application
-- Ajoute `http://localhost:8888/callback` comme Redirect URI
-- Note le **Client ID** et le **Client Secret**
-
-**2. Une cle API LLM**
-
-- Va sur [console.anthropic.com](https://console.anthropic.com)
-- Cree une cle API
+Pas besoin de creer l'app Spotify Developer a l'avance : **l'assistant de configuration te guide a chaque etape**.
 
 ## Utilisation
 
 ### Premier lancement
 
-Lance le binaire. Une fenetre de configuration s'ouvre pour saisir tes cles API :
+Lance le binaire. Un assistant de configuration s'ouvre en 4 etapes :
 
-- Spotify Client ID
-- Spotify Client Secret
-- Cle API LLM
+```
+  1. Welcome     →  Presentation
+  2. Spotify     →  Guide pas-a-pas pour creer ton app Developer
+  3. AI Provider →  Choix du fournisseur IA + cle API
+  4. Ready       →  Recap et lancement
+```
 
-Les cles sont sauvegardees dans un fichier `config.json` a cote de l'executable. Tu n'auras pas a les re-saisir.
+Les liens vers les dashboards s'ouvrent directement depuis l'assistant. Tout est sauvegarde dans `config.json` a cote de l'executable.
+
+### Fournisseurs IA supportes
+
+| Fournisseur | Modele par defaut | Lien |
+|-------------|------------------|------|
+| **OpenAI** (recommande) | `gpt-4o-mini` | [platform.openai.com](https://platform.openai.com/api-keys) |
+| Anthropic | `claude-3-haiku` | [console.anthropic.com](https://console.anthropic.com) |
 
 ### Flux de travail
 

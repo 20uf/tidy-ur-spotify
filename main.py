@@ -6,7 +6,7 @@ import sys
 def main():
     from src.storage import user_config
 
-    # First-launch: show setup dialog if config is missing
+    # First-launch: show onboarding wizard if config is missing
     if not user_config.is_configured():
         from src.ui.setup_dialog import SetupDialog
 
@@ -19,6 +19,7 @@ def main():
     from src.config import reload
     reload()
 
+    from src.config import LLM_API_KEY, LLM_MODEL, LLM_PROVIDER
     from src.auth.spotify_oauth import get_spotify_client
     from src.services.llm_classifier import LLMClassifier
     from src.services.playlist_manager import PlaylistManager
@@ -45,7 +46,11 @@ def main():
         sys.exit(0)
 
     # Initialize services
-    classifier = LLMClassifier()
+    classifier = LLMClassifier(
+        provider=LLM_PROVIDER,
+        api_key=LLM_API_KEY,
+        model=LLM_MODEL,
+    )
     playlist_mgr = PlaylistManager(sp)
     store = ProgressStore()
 

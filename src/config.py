@@ -7,12 +7,15 @@ _cfg = user_config.load()
 
 def reload():
     """Reload config from disk (call after setup dialog saves)."""
-    global _cfg, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_REDIRECT_URI, LLM_API_KEY
+    global _cfg, SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, SPOTIFY_REDIRECT_URI
+    global LLM_PROVIDER, LLM_API_KEY, LLM_MODEL
     _cfg = user_config.load()
     SPOTIFY_CLIENT_ID = _cfg.get("spotify_client_id", "")
     SPOTIFY_CLIENT_SECRET = _cfg.get("spotify_client_secret", "")
     SPOTIFY_REDIRECT_URI = _cfg.get("spotify_redirect_uri", "http://localhost:8888/callback")
+    LLM_PROVIDER = _cfg.get("llm_provider", "openai")
     LLM_API_KEY = _cfg.get("llm_api_key", "")
+    LLM_MODEL = _cfg.get("llm_model", "")
 
 
 # Spotify API
@@ -22,10 +25,11 @@ SPOTIFY_REDIRECT_URI = _cfg.get("spotify_redirect_uri", "http://localhost:8888/c
 SPOTIFY_SCOPE = "user-library-read playlist-modify-public playlist-modify-private playlist-read-private"
 SPOTIFY_CACHE_PATH = ".spotify_cache"
 
-# LLM API
+# LLM
+LLM_PROVIDER = _cfg.get("llm_provider", "openai")
 LLM_API_KEY = _cfg.get("llm_api_key", "")
-LLM_MODEL = "claude-3-haiku-20240307"
-LLM_BATCH_SIZE = 10  # Pre-classify tracks in batches of 10
+LLM_MODEL = _cfg.get("llm_model", "")
+LLM_BATCH_SIZE = 10
 
 # Playlist themes
 THEMES = {
@@ -42,12 +46,12 @@ THEMES = {
 }
 
 # Sliding window config
-WINDOW_PAST = 3     # Previous tracks shown for context
-WINDOW_FUTURE = 3   # Upcoming tracks shown as preview
+WINDOW_PAST = 3
+WINDOW_FUTURE = 3
 
 # Progress file
 PROGRESS_FILE = "progress.json"
 EXPORT_CSV_FILE = "export.csv"
 
 # Audio preview
-PREVIEW_DURATION_MS = 30_000  # Spotify previews are 30s
+PREVIEW_DURATION_MS = 30_000
