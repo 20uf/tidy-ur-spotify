@@ -7,6 +7,11 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      alpha_tag:
+        description: "Alpha version label (ex: alpha.1, alpha.2)"
+        required: false
+        default: ""
 
 jobs:
   build:
@@ -63,4 +68,25 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: artifacts/**/*
+          generate_release_notes: true
+
+  alpha-release:
+    needs: build
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.alpha_tag != ''
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create alpha release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: alpha-${{ github.event.inputs.alpha_tag }}
+          name: "Alpha ${{ github.event.inputs.alpha_tag }}"
+          files: artifacts/**/*
+          prerelease: true
           generate_release_notes: true
