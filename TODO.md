@@ -19,3 +19,9 @@
 - [ ] Create use cases: `ClassifyTrackUseCase`, `UndoDecisionUseCase`, `ExportSessionUseCase`, `ResumeSessionUseCase`
 - [ ] UI becomes a driving adapter calling use cases, not services directly
 - [ ] Tests run against ports with in-memory adapters (no Spotify/LLM calls)
+
+## Auto-update
+
+- [ ] Check latest GitHub release on startup (compare `__version__` vs remote tag)
+- [ ] Notify user when a new version is available
+- [ ] Download and replace binary in-place (or prompt user to download)

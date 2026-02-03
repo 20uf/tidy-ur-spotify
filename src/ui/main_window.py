@@ -7,6 +7,7 @@ from tkinter import messagebox, ttk
 from typing import Optional
 
 from src.config import THEMES, WINDOW_FUTURE, WINDOW_PAST
+from src.version import __version__
 from src.services.llm_classifier import LLMClassifier, TrackSuggestion
 from src.services.playlist_manager import PlaylistManager
 from src.services.track_fetcher import Track
@@ -41,7 +42,7 @@ class MainWindow:
 
         # Build UI
         self.root = tk.Tk()
-        self.root.title("Spotify Ranger")
+        self.root.title(f"Spotify Ranger {__version__}")
         self.root.geometry("900x700")
         self.root.configure(bg="#191414")
         self._build_ui()

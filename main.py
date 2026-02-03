@@ -2,8 +2,14 @@
 
 import sys
 
+from src.version import __version__
+
 
 def main():
+    if "--version" in sys.argv or "-v" in sys.argv:
+        print(f"Spotify Ranger {__version__}")
+        sys.exit(0)
+
     from src.storage import user_config
 
     # First-launch: show onboarding wizard if config is missing

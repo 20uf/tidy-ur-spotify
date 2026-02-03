@@ -12,6 +12,7 @@ import webbrowser
 
 from src.services.llm_classifier import PROVIDERS
 from src.storage import user_config
+from src.version import __version__
 
 # ── Theme ──────────────────────────────────────────────────────────
 
@@ -46,7 +47,7 @@ class SetupDialog:
 
     def show(self) -> bool:
         self.root = tk.Tk()
-        self.root.title("Spotify Ranger")
+        self.root.title(f"Spotify Ranger {__version__}")
         self.root.geometry("620x520")
         self.root.resizable(False, False)
         self.root.configure(bg=BG)
