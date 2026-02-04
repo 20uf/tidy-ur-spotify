@@ -18,12 +18,15 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
-            artifact: spotify-ranger-linux
+          - os: ubuntu-22.04
+            artifact: tidy-ur-spotify-linux
+            binary_name: tidy-ur-spotify-linux
           - os: macos-latest
-            artifact: spotify-ranger-macos
+            artifact: tidy-ur-spotify-macos
+            binary_name: tidy-ur-spotify-macos
           - os: windows-latest
-            artifact: spotify-ranger-windows
+            artifact: tidy-ur-spotify-windows
+            binary_name: tidy-ur-spotify.exe
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -49,18 +52,17 @@ jobs:
       - name: Run tests
         run: python -m pytest tests/ -v
 
-      - name: Build binary with PyInstaller
-        run: |
-          pyinstaller --onefile --name spotify-ranger --windowed main.py
+      - name: Build binary with flet
+        run: flet pack main.py --name ${{ matrix.binary_name }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
-          path: dist/spotify-ranger*
+          path: dist/${{ matrix.binary_name }}
 
   release:
-    needs: build
+    needs: [build]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     permissions:
@@ -72,7 +74,7 @@ jobs:
       - name: Read version
         id: version
         run: |
-          VERSION=$(python -c "exec(open('src/version.py').read()); print(__version__)")
+          VERSION=$(python3 -c "exec(open('src/version.py').read()); print(__version__)")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - uses: actions/download-artifact@v4
@@ -87,7 +89,7 @@ jobs:
           generate_release_notes: true
 
   alpha-release:
-    needs: build
+    needs: [build]
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.alpha_tag != ''
     runs-on: ubuntu-latest
     permissions:
@@ -99,7 +101,7 @@ jobs:
       - name: Read version
         id: version
         run: |
-          VERSION=$(python -c "exec(open('src/version.py').read()); print(__version__)")
+          VERSION=$(python3 -c "exec(open('src/version.py').read()); print(__version__)")
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - uses: actions/download-artifact@v4

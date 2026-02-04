@@ -27,7 +27,7 @@ On first launch, a setup wizard guides you through Spotify and AI provider confi
 ## Build a binary
 
 ```bash
-pyinstaller --onefile --name spotify-ranger --windowed main.py
+flet pack main.py --name tidy-ur-spotify
 ```
 
 Output goes to `dist/`.
@@ -63,30 +63,45 @@ To test without creating a tag:
 3. Fill in the `alpha_tag` field (e.g. `alpha.1`, `alpha.3`)
 4. Binaries are published as a **pre-release** on the Releases page
 
-### Project structure
+## Project structure (hexagonal architecture)
 
 ```
 src/
-├── auth/spotify_oauth.py        # Spotify OAuth
-├── config.py                    # Themes, constants
-├── services/
-│   ├── track_fetcher.py         # Fetch liked songs
-│   ├── llm_classifier.py        # AI classification, multi-provider
-│   └── playlist_manager.py      # Spotify playlist management
-├── storage/
-│   ├── progress_store.py        # Progress save/load (JSON)
-│   └── user_config.py           # Persistent config (config.json)
-└── ui/
-    ├── main_window.py           # Main Tkinter GUI
-    └── setup_dialog.py          # 4-step setup wizard
+├── domain/
+│   ├── model.py              # Track, Decision, ClassificationSession, Theme, Suggestion
+│   └── ports.py              # ClassifierPort, PlaylistPort, TrackSourcePort, ConfigPort, ProgressPort
+├── adapters/
+│   ├── classifier/
+│   │   ├── _prompt.py        # Shared prompt building & parsing
+│   │   ├── openai_adapter.py # OpenAI classifier
+│   │   └── anthropic_adapter.py  # Anthropic classifier
+│   ├── spotify/
+│   │   ├── auth.py           # Spotify OAuth
+│   │   ├── track_adapter.py  # Fetch liked songs
+│   │   └── playlist_adapter.py   # Playlist management
+│   ├── config/
+│   │   └── json_config_adapter.py  # JSON config persistence
+│   └── progress/
+│       └── json_progress_adapter.py  # JSON progress persistence
+├── usecases/
+│   ├── classify_track.py     # Classify / skip a track
+│   ├── undo_decision.py      # Undo last decision
+│   ├── export_session.py     # Export to CSV
+│   └── resume_session.py     # Resume or start session
+├── ui/
+│   ├── app.py                # Main Flet app
+│   ├── theme.py              # UI color constants
+│   ├── setup_view.py         # 4-step onboarding wizard
+│   └── classify_view.py      # Classification sliding window
+└── version.py
 ```
 
 ### Adding an AI provider
 
-1. Add an entry to `PROVIDERS` in `src/services/llm_classifier.py`
-2. Create a `_call_<provider>` function with the same signature
-3. Register it in `_PROVIDER_CALLERS`
-4. The wizard picks it up automatically
+1. Create a new adapter in `src/adapters/classifier/` implementing `ClassifierPort`
+2. Add an entry to `PROVIDERS` in `src/adapters/classifier/__init__.py`
+3. Add the provider option in `src/ui/app.py` factory logic
+4. The setup wizard picks it up automatically
 
 ## Commit conventions
 
