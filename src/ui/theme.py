@@ -1,0 +1,12 @@
+"""Shared UI theme constants for Flet views."""
+
+BG = "#0D1117"
+BG_CARD = "#161B22"
+BG_INPUT = "#21262D"
+FG = "#E6EDF3"
+FG_DIM = "#8B949E"
+FG_LINK = "#58A6FF"
+ACCENT = "#1DB954"
+ACCENT_HOVER = "#1ED760"
+BORDER = "#30363D"
+DANGER = "#F85149"

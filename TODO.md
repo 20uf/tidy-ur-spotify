@@ -13,15 +13,23 @@
 
 ## Hexagonal architecture
 
-- [ ] Extract ports: `ClassifierPort`, `PlaylistPort`, `TrackSourcePort`, `ConfigPort`
-- [ ] Move current implementations to adapters: `OpenAIAdapter`, `AnthropicAdapter`, `SpotifyPlaylistAdapter`, `SpotifyTrackAdapter`, `JsonConfigAdapter`
-- [ ] Introduce domain layer: `Track`, `Decision`, `ClassificationSession` as pure domain objects (no framework dependency)
-- [ ] Create use cases: `ClassifyTrackUseCase`, `UndoDecisionUseCase`, `ExportSessionUseCase`, `ResumeSessionUseCase`
-- [ ] UI becomes a driving adapter calling use cases, not services directly
-- [ ] Tests run against ports with in-memory adapters (no Spotify/LLM calls)
+- [x] Extract ports: `ClassifierPort`, `PlaylistPort`, `TrackSourcePort`, `ConfigPort`, `ProgressPort`
+- [x] Move current implementations to adapters: `OpenAIAdapter`, `AnthropicAdapter`, `SpotifyPlaylistAdapter`, `SpotifyTrackAdapter`, `JsonConfigAdapter`, `JsonProgressAdapter`
+- [x] Introduce domain layer: `Track`, `Decision`, `ClassificationSession`, `Theme`, `Suggestion` as pure domain objects
+- [x] Create use cases: `ClassifyTrackUseCase`, `UndoDecisionUseCase`, `ExportSessionUseCase`, `ResumeSessionUseCase`
+- [x] UI becomes a driving adapter calling use cases, not services directly
+- [x] Tests run against ports with in-memory adapters (no Spotify/LLM calls)
+
+## UI migration
+
+- [x] Replace Tkinter with Flet (Flutter-based native window)
+- [x] Setup wizard as Flet view
+- [x] Classification view as Flet view
+- [ ] Audio preview (Flet audio support)
+- [ ] Mobile support (iOS/Android via Flet)
 
 ## Auto-update
 
-- [ ] Check latest GitHub release on startup (compare `__version__` vs remote tag)
-- [ ] Notify user when a new version is available
+- [x] Check latest GitHub release on startup (compare `__version__` vs remote tag)
+- [x] Notify user when a new version is available (banner with download link)
 - [ ] Download and replace binary in-place (or prompt user to download)

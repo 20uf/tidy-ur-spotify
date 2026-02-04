@@ -1,6 +1,6 @@
-# Spotify Ranger
+# Tidy ur Spotify
 
-> **Prototype (v0.1.0-alpha)** — This project is in early development and open to everyone. Feedback, ideas and contributions are welcome!
+> **Prototype (v0.2.0-alpha)** — This project is in early development and open to everyone. Feedback, ideas and contributions are welcome!
 
 Automatically classify your Spotify "Liked Songs" into themed playlists using AI.
 
@@ -17,9 +17,9 @@ Head to the [Releases](../../releases) page and download the file matching your 
 
 | System  | File |
 |---------|------|
-| Windows | `spotify-ranger.exe` |
-| macOS   | `spotify-ranger-macos` |
-| Linux   | `spotify-ranger-linux` |
+| Windows | `tidy-ur-spotify.exe` |
+| macOS   | `tidy-ur-spotify-macos` |
+| Linux   | `tidy-ur-spotify-linux` |
 
 > **Alpha** (pre-release) builds are available to test the latest features.
 
@@ -44,6 +44,10 @@ Run the binary. A setup wizard opens in 4 steps:
 ```
 
 Dashboard links open directly from the wizard. Everything is saved to `config.json` next to the executable.
+
+### Auto-update
+
+On startup, the app checks GitHub for newer releases. If a new version is available, a banner appears with a download link. No action is required — you choose when to update.
 
 ### Supported AI providers
 
@@ -84,6 +88,22 @@ Dashboard links open directly from the wizard. Everything is saved to `config.js
 
 - **Stable** (`v1.0.0`, `v1.1.0`…): tested and validated releases
 - **Alpha** (`alpha-xxx`): test builds, may contain bugs
+
+## Architecture
+
+The project uses a **hexagonal architecture** (ports & adapters):
+
+```
+src/
+├── domain/          # Pure domain: Track, Decision, Session, Ports
+├── adapters/        # Infrastructure implementations
+│   ├── classifier/  # OpenAI, Anthropic LLM adapters
+│   ├── spotify/     # Spotify API (auth, tracks, playlists)
+│   ├── config/      # JSON config persistence
+│   └── progress/    # JSON progress persistence
+├── usecases/        # Application use cases
+└── ui/              # Flet UI (driving adapter)
+```
 
 ## License
 
