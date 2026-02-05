@@ -58,7 +58,7 @@ def run_app():
                         spacing=16,
                     ),
                     expand=True,
-                    alignment=ft.alignment.center,
+                    alignment=ft.Alignment(0, 0),
                 )
             )
             page.update()
@@ -92,7 +92,7 @@ def run_app():
                         spacing=8,
                     ),
                     expand=True,
-                    alignment=ft.alignment.center,
+                    alignment=ft.Alignment(0, 0),
                 )
             )
             page.update()
