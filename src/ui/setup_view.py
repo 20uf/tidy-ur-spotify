@@ -108,7 +108,7 @@ class SetupView(ft.Column):
                         height=32,
                         border_radius=16,
                         bgcolor=circle_bg,
-                        alignment=ft.alignment.center,
+                        alignment=ft.Alignment(0, 0),
                     ),
                     ft.Text(title, size=11, color=FG if is_current else FG_DIM),
                 ],

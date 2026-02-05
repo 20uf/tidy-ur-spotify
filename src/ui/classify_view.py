@@ -61,7 +61,7 @@ class ClassifyView(ft.Column):
             content=ft.Text("Tidy ur Spotify", size=20, weight=ft.FontWeight.BOLD, color="white"),
             bgcolor=ACCENT,
             padding=ft.padding.symmetric(vertical=12, horizontal=20),
-            alignment=ft.alignment.center,
+            alignment=ft.Alignment(0, 0),
         )
 
         # Progress
