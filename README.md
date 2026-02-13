@@ -2,6 +2,8 @@
 
 > **Prototype (v0.2.0-alpha)** — This project is in early development and open to everyone. Feedback, ideas and contributions are welcome!
 
+> ⚠️ **On hold** — Spotify has temporarily disabled new Developer app registrations. The project is functional but new users cannot create the required Spotify credentials until Spotify re-enables registrations. [Check status](https://developer.spotify.com/dashboard)
+
 Automatically classify your Spotify "Liked Songs" into themed playlists using AI.
 
 | Playlist | Style |
