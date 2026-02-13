@@ -1,8 +1,13 @@
 """Main Flet application — orchestrates setup and classification views."""
 
+import atexit
+import os
+import signal
 import socket
+import sys
 import threading
 import webbrowser
+from pathlib import Path
 from urllib.parse import urlparse
 
 import flet as ft
@@ -34,6 +39,53 @@ THEMES = {
 
 THEMES_DICT = {k: {"name": v.name, "description": v.description, "key": v.shortcut} for k, v in THEMES.items()}
 
+LOCK_FILE = Path.home() / ".tidy-ur-spotify.lock"
+
+
+def _get_lock_pid() -> int | None:
+    """Read PID from lock file, return None if not found or invalid."""
+    try:
+        if LOCK_FILE.exists():
+            return int(LOCK_FILE.read_text().strip())
+    except (ValueError, OSError):
+        pass
+    return None
+
+
+def _is_process_running(pid: int) -> bool:
+    """Check if a process with given PID is running."""
+    try:
+        os.kill(pid, 0)
+        return True
+    except (OSError, ProcessLookupError):
+        return False
+
+
+def _kill_previous_instance() -> bool:
+    """Kill previous instance if running. Returns True if killed."""
+    pid = _get_lock_pid()
+    if pid and _is_process_running(pid):
+        try:
+            os.kill(pid, signal.SIGTERM)
+            return True
+        except OSError:
+            return False
+    return False
+
+
+def _create_lock():
+    """Create lock file with current PID."""
+    LOCK_FILE.write_text(str(os.getpid()))
+    atexit.register(_remove_lock)
+
+
+def _remove_lock():
+    """Remove lock file on exit."""
+    try:
+        LOCK_FILE.unlink(missing_ok=True)
+    except OSError:
+        pass
+
 
 def _is_port_available(port: int) -> bool:
     """Check if a port is available for binding."""
@@ -52,6 +104,10 @@ def _get_port_from_uri(uri: str) -> int:
 
 
 def run_app():
+    # Single instance: kill previous instance if running
+    _kill_previous_instance()
+    _create_lock()
+
     def main(page: ft.Page):
         page.title = f"Tidy ur Spotify {__version__}"
         page.bgcolor = BG
