@@ -10,8 +10,11 @@ class Track:
     name: str
     artist: str
     album: str
-    popularity: int = 0
+    popularity: int | None = None
     duration_ms: int = 0
+    release_date: str = ""
+    explicit: bool = False
+    album_image_url: Optional[str] = None
     preview_url: Optional[str] = None
     genres: list[str] = field(default_factory=list)
 

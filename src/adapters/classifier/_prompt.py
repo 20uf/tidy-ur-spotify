@@ -30,9 +30,14 @@ def build_system_prompt(themes: dict) -> str:
 def build_tracks_prompt(tracks: list[Track]) -> str:
     lines = ["Classify these tracks:\n"]
     for t in tracks:
+        popularity = t.popularity if t.popularity is not None else "unknown"
+        duration_seconds = round((t.duration_ms or 0) / 1000)
+        release_date = t.release_date or "unknown"
+        explicit = "yes" if t.explicit else "no"
         lines.append(
             f'- ID: {t.id}, Title: "{t.name}", Artist: "{t.artist}", '
-            f'Album: "{t.album}", Popularity: {t.popularity}'
+            f'Album: "{t.album}", Release Date: {release_date}, Duration Sec: {duration_seconds}, '
+            f'Explicit: {explicit}, Popularity: {popularity}'
         )
     return "\n".join(lines)
 

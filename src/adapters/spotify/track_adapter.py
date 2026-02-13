@@ -24,15 +24,21 @@ class SpotifyTrackAdapter(TrackSourcePort):
 
             for item in items:
                 t = item["track"]
+                album = t.get("album", {})
+                images = album.get("images", [])
+                cover_url = images[0].get("url") if images and isinstance(images[0], dict) else None
                 artists = ", ".join(a["name"] for a in t.get("artists", []))
                 track = Track(
                     id=t["id"],
                     name=t["name"],
                     artist=artists,
-                    album=t.get("album", {}).get("name", ""),
+                    album=album.get("name", ""),
+                    release_date=album.get("release_date", ""),
+                    explicit=bool(t.get("explicit", False)),
+                    album_image_url=cover_url,
                     preview_url=t.get("preview_url"),
                     genres=[],
-                    popularity=t.get("popularity", 0),
+                    popularity=t.get("popularity"),
                     duration_ms=t.get("duration_ms", 0),
                 )
                 tracks.append(track)

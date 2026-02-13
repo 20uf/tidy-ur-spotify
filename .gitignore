@@ -5,6 +5,7 @@ __pycache__/
 dist/
 build/
 .env
+.cache
 .cache/
 *.spec
 venv/
@@ -12,4 +13,7 @@ venv/
 progress.json
 export.csv
 .spotify_cache
+spotify_auth_cache.json
 config.json
+classification_cache.json
+logs/

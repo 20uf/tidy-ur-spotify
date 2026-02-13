@@ -60,8 +60,10 @@ class TestConfigPersistence:
         adapter = JsonConfigAdapter(path=str(tmp_path / "config.json"))
         loaded = adapter.load()
 
-        assert loaded["spotify_redirect_uri"] == "http://localhost:8888/callback"
+        assert loaded["spotify_redirect_uri"] == "http://127.0.0.1:8888/callback"
         assert loaded["llm_provider"] == "openai"
+        assert loaded["simulation_mode"] is False
+        assert loaded["legal_acknowledged"] is False
 
     def test_config_file_is_written_to_disk(self, tmp_path):
         config_path = str(tmp_path / "config.json")

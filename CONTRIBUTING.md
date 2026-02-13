@@ -5,24 +5,42 @@
 ```bash
 git clone https://github.com/20uf/tidy-ur-spotify.git
 cd tidy-ur-spotify
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+python3 -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
+```
+
+Or use the one-command bootstrap:
+
+```bash
+./scripts/dev.sh
 ```
 
 ## Run tests
 
 ```bash
-python -m pytest tests/ -v
+python3 -m pytest tests/ -v
 ```
+
+### Test strategy
+
+- Prioritize **user journey/business workflow tests** (`tests/user_journeys/`)
+- Add **integration tests** only where adapters or persistence behavior must be validated
+- Keep **unit tests** for non-trivial logic only (e.g. parsing/version comparison)
 
 ## Run the app locally
 
 ```bash
-python main.py
+python3 main.py
 ```
 
 On first launch, a setup wizard guides you through Spotify and AI provider configuration.
+
+To run safely in audit mode without touching Spotify playlists:
+
+```bash
+TIDY_SPOTIFY_SIMULATION=1 python3 main.py
+```
 
 ## Build a binary
 
@@ -34,7 +52,9 @@ Output goes to `dist/`.
 
 ## CI/CD workflow
 
-Everything is handled by `.github/workflows/build.yml`:
+Release automation is split across:
+- `.github/workflows/release-please.yml` for automated versioning + release PRs
+- `.github/workflows/build.yml` for tests + binary builds
 
 ### Automatic builds
 
@@ -43,25 +63,16 @@ Binaries (Linux, macOS, Windows) are compiled on:
 - Every **pull request** targeting `main`
 - Every **tag** matching `v*`
 
-### Stable release
+### Automated releases
 
-Create a tag to publish a release:
+Releases are automated via **Release Please**:
+1. Merge commits to `main` using Conventional Commits (`feat:`, `fix:`, etc.)
+2. Release Please updates or opens a release PR with version bump + changelog
+3. Merge that PR to publish a GitHub release and tag (`v*`)
+4. Build workflow attaches platform binaries to the release
 
-```bash
-git tag v1.0.0
-git push --tags
-```
-
-All 3 binaries are automatically attached to the GitHub release.
-
-### Alpha release (on-demand)
-
-To test without creating a tag:
-
-1. Go to **Actions** > **Build binaries**
-2. Click **Run workflow**
-3. Fill in the `alpha_tag` field (e.g. `alpha.1`, `alpha.3`)
-4. Binaries are published as a **pre-release** on the Releases page
+For full automation of downstream workflows on release tags, configure a repository secret:
+- `RELEASE_PLEASE_TOKEN` (GitHub PAT with `contents`, `pull_requests`, `issues`)
 
 ## Project structure (hexagonal architecture)
 
