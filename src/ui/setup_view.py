@@ -8,7 +8,6 @@ from src.adapters.classifier import PROVIDERS
 from src.domain.ports import ConfigPort
 from src.ui.theme import (
     ACCENT,
-    ACCENT_HOVER,
     BG,
     BG_CARD,
     BG_INPUT,
@@ -24,8 +23,9 @@ from src.version import __version__
 class SetupView(ft.Column):
     """Multi-step onboarding wizard as a Flet view."""
 
-    def __init__(self, config: ConfigPort, on_complete: callable):
+    def __init__(self, page: ft.Page, config: ConfigPort, on_complete: callable):
         super().__init__()
+        self.page = page
         self.config = config
         self.on_complete = on_complete
         self.cfg = config.load()
@@ -75,6 +75,7 @@ class SetupView(ft.Column):
             cursor_color=FG,
         )
         self.error_text = ft.Text("", color=DANGER, size=12)
+        self.is_validating = False
 
         self._render()
 
@@ -227,7 +228,7 @@ class SetupView(ft.Column):
             if i == 2:
                 step_items.append(
                     ft.Container(
-                        content=ft.Text("http://localhost:8888/callback", size=11, color=ACCENT, font_family="monospace"),
+                        content=ft.Text("http://127.0.0.1:8888/callback", size=11, color=ACCENT, font_family="monospace"),
                         bgcolor=BG_INPUT,
                         padding=ft.padding.symmetric(horizontal=10, vertical=4),
                         border_radius=4,
@@ -353,24 +354,59 @@ class SetupView(ft.Column):
     # ── Navigation ──────────────────────────────────────────────────
 
     def _on_next(self, e):
+        if self.is_validating:
+            return
         self.error_text.value = ""
+
         if self.current_step == 1:
-            if not self._validate_spotify():
-                self.update()
+            if not self._validate_spotify_fields():
+                self.page.update()
                 return
+            # Test Spotify credentials
+            self.is_validating = True
+            self.error_text.value = "Validating Spotify credentials..."
+            self.error_text.color = FG_DIM
+            self.page.update()
+
+            if not self._test_spotify_credentials():
+                self.is_validating = False
+                self.error_text.color = DANGER
+                self.page.update()
+                return
+            self.is_validating = False
+            self.error_text.value = ""
+            self.error_text.color = DANGER
+
         if self.current_step == 2:
-            if not self._validate_ai():
-                self.update()
+            if not self._validate_ai_fields():
+                self.page.update()
                 return
+            # Test AI credentials
+            self.is_validating = True
+            self.error_text.value = "Validating AI API key..."
+            self.error_text.color = FG_DIM
+            self.page.update()
+
+            if not self._test_ai_credentials():
+                self.is_validating = False
+                self.error_text.color = DANGER
+                self.page.update()
+                return
+            self.is_validating = False
+            self.error_text.value = ""
+            self.error_text.color = DANGER
+
         self.current_step += 1
         self._render()
-        self.update()
+        self.page.update()
 
     def _on_prev(self, e):
+        if self.is_validating:
+            return
         self.error_text.value = ""
         self.current_step -= 1
         self._render()
-        self.update()
+        self.page.update()
 
     def _on_finish(self, e):
         self.config.save(self.cfg)
@@ -379,11 +415,11 @@ class SetupView(ft.Column):
     def _select_provider(self, key: str):
         self.provider_var = key
         self._render()
-        self.update()
+        self.page.update()
 
     # ── Validation ──────────────────────────────────────────────────
 
-    def _validate_spotify(self) -> bool:
+    def _validate_spotify_fields(self) -> bool:
         cid = self.client_id.value.strip()
         secret = self.client_secret.value.strip()
         if not cid or not secret:
@@ -393,7 +429,31 @@ class SetupView(ft.Column):
         self.cfg["spotify_client_secret"] = secret
         return True
 
-    def _validate_ai(self) -> bool:
+    def _test_spotify_credentials(self) -> bool:
+        """Test Spotify credentials by attempting to get an access token."""
+        try:
+            import spotipy
+            from spotipy.oauth2 import SpotifyClientCredentials
+
+            auth_manager = SpotifyClientCredentials(
+                client_id=self.cfg["spotify_client_id"],
+                client_secret=self.cfg["spotify_client_secret"],
+            )
+            sp = spotipy.Spotify(auth_manager=auth_manager)
+            # Simple API call to verify credentials
+            sp.search(q="test", type="track", limit=1)
+            return True
+        except Exception as e:
+            error_msg = str(e)
+            if "Invalid client" in error_msg:
+                self.error_text.value = "Invalid Client ID or Client Secret."
+            elif "redirect" in error_msg.lower():
+                self.error_text.value = "Invalid redirect URI. Use: http://127.0.0.1:8888/callback"
+            else:
+                self.error_text.value = f"Spotify error: {error_msg[:50]}"
+            return False
+
+    def _validate_ai_fields(self) -> bool:
         key = self.api_key.value.strip()
         if not key:
             self.error_text.value = "API Key is required."
@@ -401,6 +461,40 @@ class SetupView(ft.Column):
         self.cfg["llm_provider"] = self.provider_var
         self.cfg["llm_api_key"] = key
         return True
+
+    def _test_ai_credentials(self) -> bool:
+        """Test AI provider credentials with a minimal API call."""
+        provider = self.provider_var
+        api_key = self.cfg["llm_api_key"]
+
+        try:
+            if provider == "openai":
+                from openai import OpenAI
+                client = OpenAI(api_key=api_key)
+                # Minimal API call - list models
+                client.models.list()
+                return True
+            elif provider == "anthropic":
+                from anthropic import Anthropic
+                client = Anthropic(api_key=api_key)
+                # Minimal API call - short message
+                client.messages.create(
+                    model="claude-3-haiku-20240307",
+                    max_tokens=1,
+                    messages=[{"role": "user", "content": "hi"}],
+                )
+                return True
+            return True
+        except Exception as e:
+            error_msg = str(e)
+            if "invalid" in error_msg.lower() or "auth" in error_msg.lower() or "key" in error_msg.lower():
+                self.error_text.value = "Invalid API key."
+            elif "rate" in error_msg.lower():
+                self.error_text.value = "Rate limited. API key is valid but try again later."
+                return True  # Key is valid, just rate limited
+            else:
+                self.error_text.value = f"API error: {error_msg[:50]}"
+            return False
 
     # ── Helpers ─────────────────────────────────────────────────────
 

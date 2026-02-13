@@ -9,7 +9,7 @@ from src.domain.ports import ConfigPort
 _DEFAULTS = {
     "spotify_client_id": "",
     "spotify_client_secret": "",
-    "spotify_redirect_uri": "http://localhost:8888/callback",
+    "spotify_redirect_uri": "http://127.0.0.1:8888/callback",
     "llm_provider": "openai",
     "llm_api_key": "",
     "llm_model": "",

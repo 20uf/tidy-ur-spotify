@@ -69,7 +69,7 @@ def run_app():
                 sp = get_spotify_client(
                     client_id=cfg["spotify_client_id"],
                     client_secret=cfg["spotify_client_secret"],
-                    redirect_uri=cfg.get("spotify_redirect_uri", "http://localhost:8888/callback"),
+                    redirect_uri=cfg.get("spotify_redirect_uri", "http://127.0.0.1:8888/callback"),
                 )
                 user = sp.current_user()
             except Exception as e:
@@ -173,7 +173,7 @@ def run_app():
 
         if not config.is_configured():
             from src.ui.setup_view import SetupView
-            setup = SetupView(config=config, on_complete=launch_classification)
+            setup = SetupView(page=page, config=config, on_complete=launch_classification)
             setup.expand = True
             page.add(setup)
         else:
