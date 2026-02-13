@@ -151,7 +151,7 @@ def run_app():
 
         config = JsonConfigAdapter()
 
-        def show_error_view(error: Exception, context: str, cfg: dict, on_reconfigure: callable):
+        def show_error_view(error: Exception, context: str, cfg: dict, start_step: int = 1):
             """Display error view with bug report download option."""
             report_content = _generate_bug_report(error, cfg, context)
 
@@ -204,7 +204,7 @@ def run_app():
                                         ft.ElevatedButton(
                                             "Reconfigure",
                                             icon=ft.Icons.SETTINGS,
-                                            on_click=lambda _: on_reconfigure(),
+                                            on_click=lambda _: start_setup_wizard(start_step),
                                             bgcolor=ACCENT,
                                             color="white",
                                         ),
@@ -230,11 +230,11 @@ def run_app():
             )
             page.update()
 
-        def start_setup_wizard():
-            """Show setup wizard to reconfigure."""
+        def start_setup_wizard(start_step: int = 0):
+            """Show setup wizard to reconfigure, optionally starting at a specific step."""
             page.controls.clear()
             from src.ui.setup_view import SetupView
-            setup = SetupView(page=page, config=config, on_complete=launch_classification)
+            setup = SetupView(page=page, config=config, on_complete=launch_classification, start_step=start_step)
             setup.expand = True
             page.add(setup)
             page.update()
@@ -299,7 +299,7 @@ def run_app():
                 )
                 user = sp.current_user()
             except Exception as e:
-                show_error_view(e, "Spotify authentication", cfg, start_setup_wizard)
+                show_error_view(e, "Spotify authentication", cfg, start_step=1)
                 return
 
             page.controls.clear()

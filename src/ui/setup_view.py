@@ -23,13 +23,13 @@ from src.version import __version__
 class SetupView(ft.Column):
     """Multi-step onboarding wizard as a Flet view."""
 
-    def __init__(self, page: ft.Page, config: ConfigPort, on_complete: callable):
+    def __init__(self, page: ft.Page, config: ConfigPort, on_complete: callable, start_step: int = 0):
         super().__init__()
         self.page = page
         self.config = config
         self.on_complete = on_complete
         self.cfg = config.load()
-        self.current_step = 0
+        self.current_step = start_step
         self.step_builders = [
             self._build_welcome,
             self._build_spotify,
