@@ -1,7 +1,9 @@
 """Main Flet application — orchestrates setup and classification views."""
 
+import socket
 import threading
 import webbrowser
+from urllib.parse import urlparse
 
 import flet as ft
 
@@ -31,6 +33,22 @@ THEMES = {
 }
 
 THEMES_DICT = {k: {"name": v.name, "description": v.description, "key": v.shortcut} for k, v in THEMES.items()}
+
+
+def _is_port_available(port: int) -> bool:
+    """Check if a port is available for binding."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        try:
+            s.bind(("127.0.0.1", port))
+            return True
+        except OSError:
+            return False
+
+
+def _get_port_from_uri(uri: str) -> int:
+    """Extract port number from redirect URI."""
+    parsed = urlparse(uri)
+    return parsed.port or 8888
 
 
 def run_app():
@@ -64,12 +82,43 @@ def run_app():
             page.update()
 
             cfg = config.load()
+            redirect_uri = cfg.get("spotify_redirect_uri", "http://127.0.0.1:8888/callback")
+            port = _get_port_from_uri(redirect_uri)
+
+            if not _is_port_available(port):
+                page.controls.clear()
+                page.add(
+                    ft.Container(
+                        content=ft.Column(
+                            [
+                                ft.Text("Port unavailable", color="red", size=18, weight=ft.FontWeight.BOLD),
+                                ft.Text(
+                                    f"Port {port} is already in use by another application.",
+                                    color=FG,
+                                    size=14,
+                                ),
+                                ft.Text(
+                                    "Close any other instance of Tidy ur Spotify or application using this port, then restart.",
+                                    color=FG_DIM,
+                                    size=12,
+                                ),
+                            ],
+                            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                            alignment=ft.MainAxisAlignment.CENTER,
+                            spacing=8,
+                        ),
+                        expand=True,
+                        alignment=ft.Alignment(0, 0),
+                    )
+                )
+                page.update()
+                return
 
             try:
                 sp = get_spotify_client(
                     client_id=cfg["spotify_client_id"],
                     client_secret=cfg["spotify_client_secret"],
-                    redirect_uri=cfg.get("spotify_redirect_uri", "http://127.0.0.1:8888/callback"),
+                    redirect_uri=redirect_uri,
                 )
                 user = sp.current_user()
             except Exception as e:
